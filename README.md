@@ -1,6 +1,6 @@
 AI Customer Churn Prediction
 Overview
-This project is a final-year college assignment demonstrating an end-to-end machine learning solution for a business problem. The goal is to build an AI model that predicts customer churn for a telecommunications company. The project includes a complete data science pipeline, from data analysis and model training to an interactive front-end.
+This project demonstrates an end-to-end machine learning solution for a business problem. The goal is to build an AI model that predicts customer churn for a telecommunications company. The project includes a complete data science pipeline, from data analysis and model training to an interactive front-end.
 
 The final output is an interactive dashboard built directly in a Jupyter Notebook using the ipywidgets library. This allows users to input customer data via a user-friendly form and get a real-time prediction on the likelihood of that customer churning.
 
