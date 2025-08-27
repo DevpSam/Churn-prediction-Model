@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Churn Predictor Chat</title>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+        .chat-container {
+            height: calc(100vh - 12rem); /* Full height minus padding and input area */
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        .user-message {
+            background-color: #3B82F6; /* Blue-500 */
+            color: white;
+            border-bottom-right-radius: 0.5rem;
+        }
+        .ai-message {
+            background-color: #E5E7EB; /* Gray-200 */
+            color: #1F2937; /* Gray-800 */
+            border-bottom-left-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen bg-gray-100 antialiased">
+    <!-- Chat Header -->
+    <div class="p-6 bg-white shadow-lg z-10">
+        <h1 class="text-3xl font-bold text-gray-800">AI Churn Predictor</h1>
+        <p class="text-sm text-gray-500 mt-1">Chat with the model to predict customer churn.</p>
+    </div>
+
+    <!-- Chat History -->
+    <div id="chat-history" class="chat-container flex-grow p-6 space-y-4">
+        <!-- Initial AI greeting -->
+        <div class="flex items-start">
+            <div class="bg-gray-200 p-4 rounded-xl rounded-bl-none max-w-lg shadow-md ai-message">
+                Hello! I'm an AI model designed to predict customer churn. You can ask me to predict by providing a customer's details.
+                <br><br>
+                For example, try typing: `Predict churn for a customer with 24 months tenure, monthly charges of 75, a month-to-month contract, and fiber optic internet.`
+            </div>
+        </div>
+    </div>
+
+    <!-- User Input Area -->
+    <div class="p-6 bg-white border-t border-gray-200 z-10">
+        <div class="flex space-x-3">
+            <input id="user-input" type="text" placeholder="Type your request here..." class="flex-grow rounded-full border border-gray-300 px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700">
+            <button onclick="handleUserInput()" class="bg-blue-500 text-white rounded-full p-3 w-12 h-12 flex items-center justify-center shadow-lg hover:bg-blue-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userInput = document.getElementById('user-input');
+            userInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    handleUserInput();
+                }
+            });
+        });
+
+        async function handleUserInput() {
+            const userInputField = document.getElementById('user-input');
+            const chatHistory = document.getElementById('chat-history');
+            const userMessage = userInputField.value.trim();
+
+            if (userMessage === "") return;
+
+            // Display user message in the chat
+            const userBubble = document.createElement('div');
+            userBubble.className = 'flex justify-end items-start';
+            userBubble.innerHTML = `
+                <div class="bg-blue-500 p-4 rounded-xl rounded-br-none max-w-lg shadow-md text-white user-message">
+                    ${userMessage}
+                </div>`;
+            chatHistory.appendChild(userBubble);
+
+            // Scroll to the bottom
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            // Mock AI response delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Process the user message and get a mock AI response
+            const aiResponse = processMessage(userMessage);
+
+            // Display AI response
+            const aiBubble = document.createElement('div');
+            aiBubble.className = 'flex items-start';
+            aiBubble.innerHTML = `
+                <div class="bg-gray-200 p-4 rounded-xl rounded-bl-none max-w-lg shadow-md ai-message">
+                    ${aiResponse}
+                </div>`;
+            chatHistory.appendChild(aiBubble);
+
+            // Clear input field and scroll to the bottom
+            userInputField.value = '';
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        function processMessage(message) {
+            // Simple parsing to extract data points for the mock model
+            const tenureMatch = message.match(/tenure of (\d+)/i);
+            const monthlyChargesMatch = message.match(/charges of (\d+\.?\d*)/i);
+            const contractMatch = message.match(/(month-to-month|one year|two year)/i);
+            const internetServiceMatch = message.match(/(fiber optic|dsl|no internet)/i);
+
+            const tenure = tenureMatch ? parseInt(tenureMatch[1], 10) : 0;
+            const monthlyCharges = monthlyChargesMatch ? parseFloat(monthlyChargesMatch[1]) : 0;
+            const contract = contractMatch ? contractMatch[1] : '';
+            const internetService = internetServiceMatch ? internetServiceMatch[1] : '';
+
+            // This is a simplified mock prediction based on the extracted values.
+            let churnProbability = 0.3;
+            if (contract === 'month-to-month') churnProbability += 0.4;
+            if (internetService === 'fiber optic') churnProbability += 0.2;
+            if (monthlyCharges > 80) churnProbability += 0.1;
+            if (tenure < 12) churnProbability += 0.2;
+            churnProbability = Math.min(1, Math.max(0.1, churnProbability));
+
+            const churnRisk = churnProbability > 0.5 ? 'High' : 'Low';
+            const predictionText = `Based on the details provided:
+            <ul>
+                <li>**Tenure:** ${tenure} months</li>
+                <li>**Monthly Charges:** $${monthlyCharges.toFixed(2)}</li>
+                <li>**Contract:** ${contract}</li>
+                <li>**Internet:** ${internetService}</li>
+            </ul>
+            <br>
+            The predicted churn risk is **${churnRisk}** with a probability of **${churnProbability.toFixed(2)}**.`;
+
+            return predictionText;
+        }
+    </script>
+</body>
+</html>
